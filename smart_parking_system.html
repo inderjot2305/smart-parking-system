@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartPark — Intelligent Parking System</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050c1a;
+    --surface: #0a1628;
+    --panel: #0d1e35;
+    --border: #1a3a5c;
+    --accent: #00d4ff;
+    --accent2: #00ff88;
+    --accent3: #ff6b35;
+    --danger: #ff3b5c;
+    --text: #e0f0ff;
+    --muted: #5a7fa0;
+    --glow: 0 0 20px rgba(0, 212, 255, 0.3);
+    --glow2: 0 0 20px rgba(0, 255, 136, 0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5,12,26,0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo span { color: var(--accent2); }
+
+  .nav-links { display: flex; gap: 0.5rem; }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .nav-links a:hover, .nav-links a.active {
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+  }
+
+  /* ── SECTIONS ── */
+  .section { display: none; position: relative; z-index: 1; }
+  .section.active { display: block; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    letter-spacing: 2px;
+    animation: pulse-border 2s infinite;
+  }
+
+  @keyframes pulse-border {
+    0%,100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.2); }
+    50% { box-shadow: 0 0 0 6px rgba(0,212,255,0); }
+  }
+
+  .hero h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 .line1 { color: var(--text); }
+  .hero h1 .line2 {
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(0,212,255,0.5);
+    display: block;
+  }
+
+  .hero p {
+    max-width: 600px;
+    color: var(--muted);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 3rem;
+  }
+
+  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
+  .btn {
+    padding: 12px 28px;
+    border-radius: 6px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    box-shadow: 0 0 24px rgba(0,212,255,0.35);
+  }
+  .btn-primary:hover { box-shadow: 0 0 36px rgba(0,212,255,0.6); transform: translateY(-2px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--accent2);
+    border: 1.5px solid var(--accent2);
+  }
+  .btn-outline:hover { background: rgba(0,255,136,0.08); transform: translateY(-2px); }
+
+  /* Stats strip */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 4rem;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .stat {
+    background: var(--panel);
+    padding: 1.5rem 1rem;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 2rem;
+    color: var(--accent);
+    text-shadow: var(--glow);
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  /* ── PARKING GRID (Dashboard) ── */
+  .dashboard { padding: 3rem 2rem; max-width: 1200px; margin: 0 auto; }
+
+  .page-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    text-shadow: var(--glow);
+  }
+
+  .page-sub { color: var(--muted); margin-bottom: 2.5rem; font-size: 0.9rem; }
+
+  .controls {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    align-items: center;
+  }
+
+  .select-box, .input-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .select-box:focus, .input-box:focus { border-color: var(--accent); }
+
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    align-items: center;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  .parking-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    margin-bottom: 3rem;
+  }
+
+  .slot {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    position: relative;
+    font-size: 0.65rem;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .slot:hover { transform: scale(1.07); z-index: 2; }
+
+  .slot-icon { font-size: 1.4rem; }
+  .slot-id { color: rgba(255,255,255,0.6); margin-top: 2px; }
+
+  .slot.available {
+    background: rgba(0,255,136,0.1);
+    border-color: rgba(0,255,136,0.3);
+    box-shadow: inset 0 0 12px rgba(0,255,136,0.05);
+  }
+  .slot.occupied {
+    background: rgba(255,59,92,0.12);
+    border-color: rgba(255,59,92,0.3);
+  }
+  .slot.reserved {
+    background: rgba(0,212,255,0.1);
+    border-color: rgba(0,212,255,0.3);
+  }
+  .slot.maintenance {
+    background: rgba(255,107,53,0.1);
+    border-color: rgba(255,107,53,0.3);
+  }
+
+  .slot.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 16px rgba(0,212,255,0.4);
+    transform: scale(1.1);
+  }
+
+  /* Summary cards */
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--accent); }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .card.green::before { background: var(--accent2); }
+  .card.blue::before { background: var(--accent); }
+  .card.red::before { background: var(--danger); }
+  .card.orange::before { background: var(--accent3); }
+
+  .card-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-value {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+
+  .card.green .card-value { color: var(--accent2); }
+  .card.blue .card-value { color: var(--accent); }
+  .card.red .card-value { color: var(--danger); }
+  .card.orange .card-value { color: var(--accent3); }
+
+  .card-sub { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+  /* ── BOOKING MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5,12,26,0.85);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 16px;
+    padding: 2.5rem;
+    width: 90%;
+    max-width: 480px;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal h3 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  .form-group { margin-bottom: 1.2rem; }
+
+  .form-group label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .form-group input, .form-group select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+
+  .modal-actions { display: flex; gap: 1rem; margin-top: 2rem; }
+  .modal-actions .btn { flex: 1; }
+
+  .btn-cancel {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-cancel:hover { border-color: var(--muted); color: var(--text); }
+
+  /* ── BOOKINGS TABLE ── */
+  .bookings-section { padding: 3rem 2rem; max-width: 1200px; margin: 0 auto; }
+
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  th {
+    background: var(--surface);
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+
+  td {
+    padding: 13px 16px;
+    border-bottom: 1px solid rgba(26,58,92,0.5);
+    color: var(--text);
+    transition: background 0.15s;
+  }
+
+  tr:hover td { background: rgba(0,212,255,0.04); }
+
+  .status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .badge-active { background: rgba(0,255,136,0.15); color: var(--accent2); border: 1px solid rgba(0,255,136,0.3); }
+  .badge-completed { background: rgba(0,212,255,0.15); color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
+  .badge-cancelled { background: rgba(255,59,92,0.15); color: var(--danger); border: 1px solid rgba(255,59,92,0.3); }
+
+  .btn-sm {
+    padding: 5px 12px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .btn-danger-sm { background: rgba(255,59,92,0.15); color: var(--danger); border: 1px solid var(--danger); }
+  .btn-danger-sm:hover { background: var(--danger); color: white; }
+
+  /* ── SQL SECTION ── */
+  .sql-section { padding: 3rem 2rem; max-width: 1200px; margin: 0 auto; }
+
+  .sql-tabs { display: flex; gap: 4px; margin-bottom: 2rem; flex-wrap: wrap; }
+
+  .tab-btn {
+    padding: 8px 18px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    border-bottom: none;
+  }
+
+  .tab-btn.active, .tab-btn:hover {
+    background: var(--surface);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .sql-pane { display: none; }
+  .sql-pane.active { display: block; }
+
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0 12px 12px 12px;
+    padding: 2rem;
+    position: relative;
+    overflow-x: auto;
+  }
+
+  pre {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    color: #c9d8e8;
+    white-space: pre-wrap;
+  }
+
+  .kw { color: #00d4ff; }
+  .fn { color: #ffd166; }
+  .str { color: #00ff88; }
+  .cm { color: #456789; font-style: italic; }
+  .type { color: #ff9f43; }
+  .num { color: #f7d794; }
+  .sym { color: #a29bfe; }
+
+  .copy-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: 'Share Tech Mono', monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── JAVA SECTION ── */
+  .java-section { padding: 3rem 2rem; max-width: 1200px; margin: 0 auto; }
+
+  .java-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .java-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .java-card:hover { border-color: var(--accent); }
+
+  .java-card-header {
+    padding: 1rem 1.5rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .java-card pre {
+    padding: 1.5rem;
+    font-size: 0.78rem;
+    overflow-x: auto;
+    max-height: 340px;
+    overflow-y: auto;
+  }
+
+  .java-card pre::-webkit-scrollbar { width: 4px; }
+  .java-card pre::-webkit-scrollbar-track { background: var(--surface); }
+  .java-card pre::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--panel);
+    border: 1px solid var(--accent2);
+    border-left: 4px solid var(--accent2);
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--accent2);
+    z-index: 300;
+    transform: translateX(120%);
+    transition: transform 0.3s;
+    max-width: 300px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .toast.show { transform: translateX(0); }
+  .toast.error { border-color: var(--danger); color: var(--danger); }
+
+  /* ── ABOUT ── */
+  .about-section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+
+  .arch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+
+  .arch-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .arch-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,212,255,0.1); }
+
+  .arch-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .arch-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .arch-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+
+  .tech-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 1rem; justify-content: center; }
+
+  .tag {
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 600px) {
+    .stats-strip { grid-template-columns: repeat(2,1fr); }
+    .nav-links a { font-size: 0.7rem; padding: 5px 8px; }
+    .hero h1 { font-size: 2.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">🅿 Smart<span>Park</span></div>
+  <div class="nav-links">
+    <a onclick="showSection('home')" class="active" id="nav-home">Home</a>
+    <a onclick="showSection('dashboard')" id="nav-dashboard">Dashboard</a>
+    <a onclick="showSection('bookings')" id="nav-bookings">Bookings</a>
+    <a onclick="showSection('sql')" id="nav-sql">SQL Queries</a>
+    <a onclick="showSection('java')" id="nav-java">Java Code</a>
+    <a onclick="showSection('about')" id="nav-about">About</a>
+  </div>
+</nav>
+
+<!-- ══════════ HOME ══════════ -->
+<section class="section active" id="home">
+  <div class="hero">
+    <div class="hero-badge">⬡ NEXT-GEN PARKING INFRASTRUCTURE</div>
+    <h1>
+      <span class="line1">Intelligent</span>
+      <span class="line2">Parking System</span>
+    </h1>
+    <p>A full-stack solution built with Java backend and MySQL database. Real-time slot monitoring, smart booking engine, and live occupancy analytics — all in one platform.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary" onclick="showSection('dashboard')">View Live Dashboard</button>
+      <button class="btn btn-outline" onclick="showSection('sql')">Explore SQL Schema</button>
+    </div>
+    <div class="stats-strip">
+      <div class="stat"><div class="stat-num" id="hs-total">50</div><div class="stat-label">Total Slots</div></div>
+      <div class="stat"><div class="stat-num" id="hs-avail" style="color:var(--accent2)">--</div><div class="stat-label">Available</div></div>
+      <div class="stat"><div class="stat-num" id="hs-occ" style="color:var(--danger)">--</div><div class="stat-label">Occupied</div></div>
+      <div class="stat"><div class="stat-num" id="hs-rev" style="color:var(--accent3)">₹--</div><div class="stat-label">Revenue Today</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ DASHBOARD ══════════ -->
+<section class="section" id="dashboard">
+  <div class="dashboard">
+    <div class="page-title">Parking Dashboard</div>
+    <div class="page-sub">Click any slot to book, release, or view details.</div>
+
+    <div class="summary-cards">
+      <div class="card green">
+        <div class="card-label">Available</div>
+        <div class="card-value" id="cnt-avail">--</div>
+        <div class="card-sub">slots ready to book</div>
+      </div>
+      <div class="card red">
+        <div class="card-label">Occupied</div>
+        <div class="card-value" id="cnt-occ">--</div>
+        <div class="card-sub">slots in use</div>
+      </div>
+      <div class="card blue">
+        <div class="card-label">Reserved</div>
+        <div class="card-value" id="cnt-res">--</div>
+        <div class="card-sub">pre-booked slots</div>
+      </div>
+      <div class="card orange">
+        <div class="card-label">Maintenance</div>
+        <div class="card-value" id="cnt-mnt">--</div>
+        <div class="card-sub">under service</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <select class="select-box" id="floor-select" onchange="renderGrid()">
+        <option value="all">All Floors</option>
+        <option value="A">Floor A (Ground)</option>
+        <option value="B">Floor B (Level 1)</option>
+        <option value="C">Floor C (Level 2)</option>
+      </select>
+      <select class="select-box" id="type-filter" onchange="renderGrid()">
+        <option value="all">All Types</option>
+        <option value="Car">🚗 Car</option>
+        <option value="Bike">🏍️ Bike</option>
+        <option value="EV">⚡ EV</option>
+        <option value="Handicap">♿ Handicap</option>
+      </select>
+      <select class="select-box" id="status-filter" onchange="renderGrid()">
+        <option value="all">All Statuses</option>
+        <option value="available">Available</option>
+        <option value="occupied">Occupied</option>
+        <option value="reserved">Reserved</option>
+      </select>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(0,255,136,0.5)"></div> Available</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,59,92,0.5)"></div> Occupied</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(0,212,255,0.5)"></div> Reserved</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,107,53,0.5)"></div> Maintenance</div>
+    </div>
+
+    <div class="parking-grid" id="parking-grid"></div>
+  </div>
+</section>
+
+<!-- ══════════ BOOKINGS ══════════ -->
+<section class="section" id="bookings">
+  <div class="bookings-section">
+    <div class="page-title">Booking Records</div>
+    <div class="page-sub">Live booking data — simulating MySQL SELECT queries on the bookings table.</div>
+
+    <div class="controls" style="margin-bottom:1.5rem">
+      <input class="input-box" type="text" id="search-box" placeholder="Search by vehicle / slot..." oninput="renderTable()" style="width:260px">
+      <select class="select-box" id="status-table-filter" onchange="renderTable()">
+        <option value="all">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <button class="btn btn-primary" style="font-size:0.8rem;padding:10px 18px" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+
+    <div class="table-wrap">
+      <table id="bookings-table">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Slot</th>
+            <th>Vehicle No.</th>
+            <th>Driver</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SQL QUERIES ══════════ -->
+<section class="section" id="sql">
+  <div class="sql-section">
+    <div class="page-title">MySQL Queries</div>
+    <div class="page-sub">Complete database schema and operations used in the SmartPark backend.</div>
+
+    <div class="sql-tabs">
+      <button class="tab-btn active" onclick="showTab('ddl')">DDL Schema</button>
+      <button class="tab-btn" onclick="showTab('insert')">INSERT Data</button>
+      <button class="tab-btn" onclick="showTab('select')">SELECT Queries</button>
+      <button class="tab-btn" onclick="showTab('update')">UPDATE / DELETE</button>
+      <button class="tab-btn" onclick="showTab('proc')">Stored Procedures</button>
+      <button class="tab-btn" onclick="showTab('trigger')">Triggers</button>
+    </div>
+
+    <div class="sql-pane active" id="tab-ddl">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('tab-ddl')">COPY</button>
+        <pre><span class="cm">-- ============================================
+--   SmartPark Database Schema (MySQL)
+-- ============================================</span>
+
+<span class="kw">CREATE DATABASE</span> <span class="fn">smartpark_db</span>;
+<span class="kw">USE</span> <span class="fn">smartpark_db</span>;
+
+<span class="cm">-- Parking Floors / Zones</span>
+<span class="kw">CREATE TABLE</span> <span class="fn">floors</span> (
+  <span class="type">floor_id</span>    <span class="kw">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
+  <span class="type">floor_code</span>  <span class="kw">CHAR</span>(<span class="num">1</span>) <span class="kw">NOT NULL UNIQUE</span>,
+  <span class="type">floor_name</span>  <span class="kw">VARCHAR</span>(<span class="num">50</span>) <span class="kw">NOT NULL</span>,
+  <span class="type">total_slots</span> <span class="kw">INT</span> <span class="kw">DEFAULT</span> <span class="num">0</span>,
+  <span class="type">created_at</span>  <span class="kw">TIMESTAMP DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>
+);
+
+<span class="cm">-- Parking Slots</span>
+<span class="kw">CREATE TABLE</span> <span class="fn">parking_slots</span> (
+  <span class="type">slot_id</span>     <span class="kw">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
+  <span class="type">slot_code</span>   <span class="kw">VARCHAR</span>(<span class="num">10</span>) <span class="kw">NOT NULL UNIQUE</span>,
+  <span class="type">floor_id</span>    <span class="kw">INT</span>,
+  <span class="type">slot_type</span>   <span class="kw">ENUM</span>(<span class="str">'Car'</span>, <span class="str">'Bike'</span>, <span class="str">'EV'</span>, <span class="str">'Handicap'</span>) <span class="kw">DEFAULT</span> <span class="str">'Car'</span>,
+  <span class="type">status</span>      <span class="kw">ENUM</span>(<span class="str">'available'</span>, <span class="str">'occupied'</span>, <span class="str">'reserved'</span>, <span class="str">'maintenance'</span>) 
+              <span class="kw">DEFAULT</span> <span class="str">'available'</span>,
+  <span class="type">hourly_rate</span> <span class="kw">DECIMAL</span>(<span class="num">8,2</span>) <span class="kw">DEFAULT</span> <span class="num">30.00</span>,
+  <span class="kw">FOREIGN KEY</span> (<span class="type">floor_id</span>) <span class="kw">REFERENCES</span> <span class="fn">floors</span>(<span class="type">floor_id</span>) <span class="kw">ON DELETE CASCADE</span>
+);
+
+<span class="cm">-- Users / Drivers</span>
+<span class="kw">CREATE TABLE</span> <span class="fn">users</span> (
+  <span class="type">user_id</span>     <span class="kw">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
+  <span class="type">full_name</span>   <span class="kw">VARCHAR</span>(<span class="num">100</span>) <span class="kw">NOT NULL</span>,
+  <span class="type">email</span>       <span class="kw">VARCHAR</span>(<span class="num">150</span>) <span class="kw">UNIQUE NOT NULL</span>,
+  <span class="type">phone</span>       <span class="kw">VARCHAR</span>(<span class="num">15</span>),
+  <span class="type">password_hash</span> <span class="kw">VARCHAR</span>(<span class="num">255</span>),
+  <span class="type">role</span>        <span class="kw">ENUM</span>(<span class="str">'admin'</span>, <span class="str">'driver'</span>) <span class="kw">DEFAULT</span> <span class="str">'driver'</span>,
+  <span class="type">created_at</span>  <span class="kw">TIMESTAMP DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>
+);
+
+<span class="cm">-- Vehicles</span>
+<span class="kw">CREATE TABLE</span> <span class="fn">vehicles</span> (
+  <span class="type">vehicle_id</span>  <span class="kw">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
+  <span class="type">user_id</span>     <span class="kw">INT</span>,
+  <span class="type">plate_no</span>    <span class="kw">VARCHAR</span>(<span class="num">20</span>) <span class="kw">NOT NULL UNIQUE</span>,
+  <span class="type">vehicle_type</span> <span class="kw">ENUM</span>(<span class="str">'Car'</span>, <span class="str">'Bike'</span>, <span class="str">'EV'</span>) <span class="kw">DEFAULT</span> <span class="str">'Car'</span>,
+  <span class="type">model</span>       <span class="kw">VARCHAR</span>(<span class="num">80</span>),
+  <span class="kw">FOREIGN KEY</span> (<span class="type">user_id</span>) <span class="kw">REFERENCES</span> <span class="fn">users</span>(<span class="type">user_id</span>)
+);
+
+<span class="cm">-- Bookings</span>
+<span class="kw">CREATE TABLE</span> <span class="fn">bookings</span> (
+  <span class="type">booking_id</span>  <span class="kw">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
+  <span class="type">slot_id</span>     <span class="kw">INT</span> <span class="kw">NOT NULL</span>,
+  <span class="type">user_id</span>     <span class="kw">INT</span> <span class="kw">NOT NULL</span>,
+  <span class="type">vehicle_id</span>  <span class="kw">INT</span> <span class="kw">NOT NULL</span>,
+  <span class="type">check_in</span>    <span class="kw">DATETIME NOT NULL DEFAULT</span> <span class="fn">NOW</span>(),
+  <span class="type">check_out</span>   <span class="kw">DATETIME</span>,
+  <span class="type">duration_hrs</span> <span class="kw">DECIMAL</span>(<span class="num">5,2</span>),
+  <span class="type">amount</span>      <span class="kw">DECIMAL</span>(<span class="num">10,2</span>),
+  <span class="type">status</span>      <span class="kw">ENUM</span>(<span class="str">'active'</span>, <span class="str">'completed'</span>, <span class="str">'cancelled'</span>) <span class="kw">DEFAULT</span> <span class="str">'active'</span>,
+  <span class="type">created_at</span>  <span class="kw">TIMESTAMP DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>,
+  <span class="kw">FOREIGN KEY</span> (<span class="type">slot_id</span>)    <span class="kw">REFERENCES</span> <span class="fn">parking_slots</span>(<span class="type">slot_id</span>),
+  <span class="kw">FOREIGN KEY</span> (<span class="type">user_id</span>)    <span class="kw">REFERENCES</span> <span class="fn">users</span>(<span class="type">user_id</span>),
+  <span class="kw">FOREIGN KEY</span> (<span class="type">vehicle_id</span>) <span class="kw">REFERENCES</span> <span class="fn">vehicles</span>(<span class="type">vehicle_id</span>)
+);
+
+<span class="cm">-- Payments</span>
+<span class="kw">CREATE TABLE</span> <span class="fn">payments</span> (
+  <span class="type">payment_id</span>  <span class="kw">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
+  <span class="type">booking_id</span>  <span class="kw">INT UNIQUE NOT NULL</span>,
+  <span class="type">amount</span>      <span class="kw">DECIMAL</span>(<span class="num">10,2</span>),
+  <span class="type">method</span>      <span class="kw">ENUM</span>(<span class="str">'Cash'</span>,<span class="str">'UPI'</span>,<span class="str">'Card'</span>,<span class="str">'Wallet'</span>) <span class="kw">DEFAULT</span> <span class="str">'UPI'</span>,
+  <span class="type">paid_at</span>     <span class="kw">TIMESTAMP DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>,
+  <span class="type">status</span>      <span class="kw">ENUM</span>(<span class="str">'pending'</span>,<span class="str">'success'</span>,<span class="str">'failed'</span>) <span class="kw">DEFAULT</span> <span class="str">'pending'</span>,
+  <span class="kw">FOREIGN KEY</span> (<span class="type">booking_id</span>) <span class="kw">REFERENCES</span> <span class="fn">bookings</span>(<span class="type">booking_id</span>)
+);</pre>
+      </div>
+    </div>
+
+    <div class="sql-pane" id="tab-insert">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('tab-insert')">COPY</button>
+        <pre><span class="cm">-- Insert Floors</span>
+<span class="kw">INSERT INTO</span> <span class="fn">floors</span> (<span class="type">floor_code</span>, <span class="type">floor_name</span>, <span class="type">total_slots</span>) <span class="kw">VALUES</span>
+  (<span class="str">'A'</span>, <span class="str">'Ground Floor'</span>,  <span class="num">20</span>),
+  (<span class="str">'B'</span>, <span class="str">'Level 1'</span>,        <span class="num">20</span>),
+  (<span class="str">'C'</span>, <span class="str">'Level 2'</span>,        <span class="num">10</span>);
+
+<span class="cm">-- Insert Slots (sample)</span>
+<span class="kw">INSERT INTO</span> <span class="fn">parking_slots</span> (<span class="type">slot_code</span>, <span class="type">floor_id</span>, <span class="type">slot_type</span>, <span class="type">status</span>, <span class="type">hourly_rate</span>) <span class="kw">VALUES</span>
+  (<span class="str">'A-01'</span>, <span class="num">1</span>, <span class="str">'Car'</span>,      <span class="str">'available'</span>,  <span class="num">30.00</span>),
+  (<span class="str">'A-02'</span>, <span class="num">1</span>, <span class="str">'Car'</span>,      <span class="str">'occupied'</span>,   <span class="num">30.00</span>),
+  (<span class="str">'A-03'</span>, <span class="num">1</span>, <span class="str">'EV'</span>,       <span class="str">'available'</span>,  <span class="num">50.00</span>),
+  (<span class="str">'A-04'</span>, <span class="num">1</span>, <span class="str">'Bike'</span>,     <span class="str">'available'</span>,  <span class="num">15.00</span>),
+  (<span class="str">'A-05'</span>, <span class="num">1</span>, <span class="str">'Handicap'</span>, <span class="str">'reserved'</span>,   <span class="num">20.00</span>),
+  (<span class="str">'B-01'</span>, <span class="num">2</span>, <span class="str">'Car'</span>,      <span class="str">'available'</span>,  <span class="num">30.00</span>),
+  (<span class="str">'B-02'</span>, <span class="num">2</span>, <span class="str">'Car'</span>,      <span class="str">'maintenance'</span>,<span class="num">30.00</span>);
+
+<span class="cm">-- Insert Users</span>
+<span class="kw">INSERT INTO</span> <span class="fn">users</span> (<span class="type">full_name</span>, <span class="type">email</span>, <span class="type">phone</span>, <span class="type">role</span>) <span class="kw">VALUES</span>
+  (<span class="str">'Arjun Sharma'</span>,   <span class="str">'arjun@mail.com'</span>,  <span class="str">'9876543210'</span>, <span class="str">'driver'</span>),
+  (<span class="str">'Priya Kapoor'</span>,   <span class="str">'priya@mail.com'</span>,  <span class="str">'9845612340'</span>, <span class="str">'driver'</span>),
+  (<span class="str">'Admin User'</span>,     <span class="str">'admin@smart.com'</span>, <span class="str">'9900000001'</span>, <span class="str">'admin'</span>);
+
+<span class="cm">-- Insert Booking</span>
+<span class="kw">INSERT INTO</span> <span class="fn">bookings</span> (<span class="type">slot_id</span>, <span class="type">user_id</span>, <span class="type">vehicle_id</span>, <span class="type">check_in</span>, <span class="type">status</span>) <span class="kw">VALUES</span>
+  (<span class="num">1</span>, <span class="num">1</span>, <span class="num">1</span>, <span class="fn">NOW</span>(), <span class="str">'active'</span>);</pre>
+      </div>
+    </div>
+
+    <div class="sql-pane" id="tab-select">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('tab-select')">COPY</button>
+        <pre><span class="cm">-- 1. All available slots with floor info</span>
+<span class="kw">SELECT</span>
+  ps.slot_code,
+  f.floor_name,
+  ps.slot_type,
+  ps.hourly_rate
+<span class="kw">FROM</span> <span class="fn">parking_slots</span> ps
+<span class="kw">JOIN</span> <span class="fn">floors</span> f <span class="kw">ON</span> ps.floor_id = f.floor_id
+<span class="kw">WHERE</span> ps.status = <span class="str">'available'</span>
+<span class="kw">ORDER BY</span> f.floor_code, ps.slot_code;
+
+<span class="cm">-- 2. Active bookings with user & vehicle details</span>
+<span class="kw">SELECT</span>
+  b.booking_id,
+  ps.slot_code,
+  u.full_name,
+  v.plate_no,
+  b.check_in,
+  <span class="fn">TIMESTAMPDIFF</span>(<span class="kw">MINUTE</span>, b.check_in, <span class="fn">NOW</span>()) <span class="kw">AS</span> mins_parked,
+  b.status
+<span class="kw">FROM</span> <span class="fn">bookings</span> b
+<span class="kw">JOIN</span> <span class="fn">parking_slots</span> ps <span class="kw">ON</span> b.slot_id    = ps.slot_id
+<span class="kw">JOIN</span> <span class="fn">users</span>         u  <span class="kw">ON</span> b.user_id   = u.user_id
+<span class="kw">JOIN</span> <span class="fn">vehicles</span>      v  <span class="kw">ON</span> b.vehicle_id = v.vehicle_id
+<span class="kw">WHERE</span> b.status = <span class="str">'active'</span>;
+
+<span class="cm">-- 3. Slot occupancy stats by floor</span>
+<span class="kw">SELECT</span>
+  f.floor_name,
+  <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total,
+  <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> ps.status = <span class="str">'available'</span>   <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">ELSE</span> <span class="num">0</span> <span class="kw">END</span>) <span class="kw">AS</span> available,
+  <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> ps.status = <span class="str">'occupied'</span>    <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">ELSE</span> <span class="num">0</span> <span class="kw">END</span>) <span class="kw">AS</span> occupied,
+  <span class="fn">ROUND</span>(<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> ps.status=<span class="str">'occupied'</span> <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">ELSE</span> <span class="num">0</span> <span class="kw">END</span>) * <span class="num">100.0</span>
+        / <span class="fn">COUNT</span>(*), <span class="num">1</span>) <span class="kw">AS</span> occupancy_pct
+<span class="kw">FROM</span> <span class="fn">parking_slots</span> ps
+<span class="kw">JOIN</span> <span class="fn">floors</span> f <span class="kw">ON</span> ps.floor_id = f.floor_id
+<span class="kw">GROUP BY</span> f.floor_id;
+
+<span class="cm">-- 4. Today's revenue</span>
+<span class="kw">SELECT</span>
+  <span class="fn">COUNT</span>(*) <span class="kw">AS</span> bookings_today,
+  <span class="fn">SUM</span>(b.amount) <span class="kw">AS</span> total_revenue,
+  <span class="fn">AVG</span>(b.duration_hrs) <span class="kw">AS</span> avg_duration_hrs
+<span class="kw">FROM</span> <span class="fn">bookings</span> b
+<span class="kw">WHERE</span> <span class="fn">DATE</span>(b.created_at) = <span class="fn">CURDATE</span>()
+  <span class="kw">AND</span> b.status = <span class="str">'completed'</span>;
+
+<span class="cm">-- 5. Top 5 most-used slots</span>
+<span class="kw">SELECT</span>
+  ps.slot_code,
+  <span class="fn">COUNT</span>(b.booking_id) <span class="kw">AS</span> total_bookings,
+  <span class="fn">SUM</span>(b.amount) <span class="kw">AS</span> revenue_generated
+<span class="kw">FROM</span> <span class="fn">bookings</span> b
+<span class="kw">JOIN</span> <span class="fn">parking_slots</span> ps <span class="kw">ON</span> b.slot_id = ps.slot_id
+<span class="kw">GROUP BY</span> ps.slot_id
+<span class="kw">ORDER BY</span> total_bookings <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">5</span>;</pre>
+      </div>
+    </div>
+
+    <div class="sql-pane" id="tab-update">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('tab-update')">COPY</button>
+        <pre><span class="cm">-- Mark slot as occupied on booking</span>
+<span class="kw">UPDATE</span> <span class="fn">parking_slots</span>
+<span class="kw">SET</span>    status = <span class="str">'occupied'</span>
+<span class="kw">WHERE</span>  slot_id = <span class="num">?</span>;  <span class="cm">-- ? = parameterised via PreparedStatement</span>
+
+<span class="cm">-- Complete a booking (check-out)</span>
+<span class="kw">UPDATE</span> <span class="fn">bookings</span>
+<span class="kw">SET</span>
+  check_out    = <span class="fn">NOW</span>(),
+  duration_hrs = <span class="fn">ROUND</span>(<span class="fn">TIMESTAMPDIFF</span>(<span class="kw">MINUTE</span>, check_in, <span class="fn">NOW</span>()) / <span class="num">60.0</span>, <span class="num">2</span>),
+  amount       = <span class="fn">ROUND</span>(<span class="fn">TIMESTAMPDIFF</span>(<span class="kw">MINUTE</span>, check_in, <span class="fn">NOW</span>()) / <span class="num">60.0</span> * (<span class="kw">SELECT</span> hourly_rate
+                 <span class="kw">FROM</span> <span class="fn">parking_slots</span> <span class="kw">WHERE</span> slot_id = bookings.slot_id), <span class="num">2</span>),
+  status       = <span class="str">'completed'</span>
+<span class="kw">WHERE</span>  booking_id = <span class="num">?</span>;
+
+<span class="cm">-- Free the slot after checkout</span>
+<span class="kw">UPDATE</span> <span class="fn">parking_slots</span>
+<span class="kw">SET</span>    status = <span class="str">'available'</span>
+<span class="kw">WHERE</span>  slot_id = (
+  <span class="kw">SELECT</span> slot_id <span class="kw">FROM</span> <span class="fn">bookings</span> <span class="kw">WHERE</span> booking_id = <span class="num">?</span>
+);
+
+<span class="cm">-- Cancel a booking</span>
+<span class="kw">UPDATE</span> <span class="fn">bookings</span> <span class="kw">SET</span> status = <span class="str">'cancelled'</span> <span class="kw">WHERE</span> booking_id = <span class="num">?</span>;
+
+<span class="cm">-- Delete old completed bookings (>30 days)</span>
+<span class="kw">DELETE FROM</span> <span class="fn">bookings</span>
+<span class="kw">WHERE</span>  status = <span class="str">'completed'</span>
+  <span class="kw">AND</span>  check_out &lt; <span class="fn">DATE_SUB</span>(<span class="fn">NOW</span>(), <span class="kw">INTERVAL</span> <span class="num">30</span> <span class="kw">DAY</span>);</pre>
+      </div>
+    </div>
+
+    <div class="sql-pane" id="tab-proc">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('tab-proc')">COPY</button>
+        <pre><span class="cm">-- Stored Procedure: Book a Slot</span>
+<span class="kw">DELIMITER</span> //
+<span class="kw">CREATE PROCEDURE</span> <span class="fn">sp_book_slot</span>(
+  <span class="kw">IN</span>  <span class="type">p_slot_id</span>   <span class="kw">INT</span>,
+  <span class="kw">IN</span>  <span class="type">p_user_id</span>   <span class="kw">INT</span>,
+  <span class="kw">IN</span>  <span class="type">p_vehicle_id</span> <span class="kw">INT</span>,
+  <span class="kw">OUT</span> <span class="type">p_booking_id</span> <span class="kw">INT</span>,
+  <span class="kw">OUT</span> <span class="type">p_msg</span>       <span class="kw">VARCHAR</span>(<span class="num">100</span>)
+)
+<span class="kw">BEGIN</span>
+  <span class="kw">DECLARE</span> <span class="type">v_status</span> <span class="kw">VARCHAR</span>(<span class="num">20</span>);
+
+  <span class="kw">START TRANSACTION</span>;
+
+  <span class="kw">SELECT</span> status <span class="kw">INTO</span> v_status
+  <span class="kw">FROM</span>  <span class="fn">parking_slots</span>
+  <span class="kw">WHERE</span> slot_id = p_slot_id
+  <span class="kw">FOR UPDATE</span>;  <span class="cm">-- row lock</span>
+
+  <span class="kw">IF</span> v_status != <span class="str">'available'</span> <span class="kw">THEN</span>
+    <span class="kw">SET</span> p_msg = <span class="str">'SLOT_NOT_AVAILABLE'</span>;
+    <span class="kw">ROLLBACK</span>;
+  <span class="kw">ELSE</span>
+    <span class="kw">INSERT INTO</span> <span class="fn">bookings</span> (slot_id, user_id, vehicle_id, check_in, status)
+    <span class="kw">VALUES</span> (p_slot_id, p_user_id, p_vehicle_id, <span class="fn">NOW</span>(), <span class="str">'active'</span>);
+
+    <span class="kw">SET</span> p_booking_id = <span class="fn">LAST_INSERT_ID</span>();
+
+    <span class="kw">UPDATE</span> <span class="fn">parking_slots</span> <span class="kw">SET</span> status = <span class="str">'occupied'</span>
+    <span class="kw">WHERE</span>  slot_id = p_slot_id;
+
+    <span class="kw">SET</span> p_msg = <span class="str">'SUCCESS'</span>;
+    <span class="kw">COMMIT</span>;
+  <span class="kw">END IF</span>;
+<span class="kw">END</span>//
+<span class="kw">DELIMITER</span> ;
+
+<span class="cm">-- Call it:</span>
+<span class="kw">CALL</span> <span class="fn">sp_book_slot</span>(<span class="num">3</span>, <span class="num">1</span>, <span class="num">1</span>, @booking_id, @msg);
+<span class="kw">SELECT</span> @booking_id, @msg;</pre>
+      </div>
+    </div>
+
+    <div class="sql-pane" id="tab-trigger">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('tab-trigger')">COPY</button>
+        <pre><span class="cm">-- Trigger: auto-free slot when booking cancelled</span>
+<span class="kw">DELIMITER</span> //
+<span class="kw">CREATE TRIGGER</span> <span class="fn">trg_booking_cancel</span>
+<span class="kw">AFTER UPDATE ON</span> <span class="fn">bookings</span>
+<span class="kw">FOR EACH ROW</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">IF</span> NEW.status = <span class="str">'cancelled'</span> <span class="kw">AND</span> OLD.status = <span class="str">'active'</span> <span class="kw">THEN</span>
+    <span class="kw">UPDATE</span> <span class="fn">parking_slots</span>
+    <span class="kw">SET</span>    status = <span class="str">'available'</span>
+    <span class="kw">WHERE</span>  slot_id = NEW.slot_id;
+  <span class="kw">END IF</span>;
+<span class="kw">END</span>//
+<span class="kw">DELIMITER</span> ;
+
+<span class="cm">-- Trigger: auto-insert payment row on booking complete</span>
+<span class="kw">DELIMITER</span> //
+<span class="kw">CREATE TRIGGER</span> <span class="fn">trg_auto_payment</span>
+<span class="kw">AFTER UPDATE ON</span> <span class="fn">bookings</span>
+<span class="kw">FOR EACH ROW</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">IF</span> NEW.status = <span class="str">'completed'</span> <span class="kw">AND</span> OLD.status = <span class="str">'active'</span> <span class="kw">THEN</span>
+    <span class="kw">INSERT INTO</span> <span class="fn">payments</span> (booking_id, amount, status)
+    <span class="kw">VALUES</span> (NEW.booking_id, NEW.amount, <span class="str">'pending'</span>);
+  <span class="kw">END IF</span>;
+<span class="kw">END</span>//
+<span class="kw">DELIMITER</span> ;</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ JAVA CODE ══════════ -->
+<section class="section" id="java">
+  <div class="java-section">
+    <div class="page-title">Java Backend Code</div>
+    <div class="page-sub">Core Java classes powering the SmartPark backend — JDBC, DAO pattern, and service layer.</div>
+
+    <div class="java-cards">
+
+      <div class="java-card">
+        <div class="java-card-header">⚙ DBConnection.java</div>
+        <pre><span class="kw">import</span> java.sql.*;
+
+<span class="kw">public class</span> <span class="fn">DBConnection</span> {
+  <span class="kw">private static final</span> <span class="type">String</span> URL =
+    <span class="str">"jdbc:mysql://localhost:3306/smartpark_db"</span>;
+  <span class="kw">private static final</span> <span class="type">String</span> USER = <span class="str">"root"</span>;
+  <span class="kw">private static final</span> <span class="type">String</span> PASS = <span class="str">"password"</span>;
+
+  <span class="kw">private static</span> <span class="type">Connection</span> conn = <span class="kw">null</span>;
+
+  <span class="kw">public static</span> <span class="type">Connection</span> <span class="fn">getConnection</span>()
+      <span class="kw">throws</span> <span class="type">SQLException</span> {
+    <span class="kw">if</span> (conn == <span class="kw">null</span> || conn.isClosed()) {
+      <span class="kw">try</span> {
+        <span class="type">Class</span>.forName(
+          <span class="str">"com.mysql.cj.jdbc.Driver"</span>);
+        conn = <span class="type">DriverManager</span>.getConnection(
+          URL, USER, PASS);
+      } <span class="kw">catch</span> (<span class="type">ClassNotFoundException</span> e) {
+        <span class="kw">throw new</span> <span class="type">SQLException</span>(
+          <span class="str">"Driver not found"</span>, e);
+      }
+    }
+    <span class="kw">return</span> conn;
+  }
+
+  <span class="kw">public static void</span> <span class="fn">close</span>() {
+    <span class="kw">try</span> {
+      <span class="kw">if</span> (conn != <span class="kw">null</span>) conn.close();
+    } <span class="kw">catch</span> (<span class="type">SQLException</span> e) {
+      e.printStackTrace();
+    }
+  }
+}</pre>
+      </div>
+
+      <div class="java-card">
+        <div class="java-card-header">🅿 ParkingSlot.java (Model)</div>
+        <pre><span class="kw">public class</span> <span class="fn">ParkingSlot</span> {
+  <span class="kw">private int</span>    slotId;
+  <span class="kw">private</span> <span class="type">String</span> slotCode;
+  <span class="kw">private int</span>    floorId;
+  <span class="kw">private</span> <span class="type">String</span> slotType;
+  <span class="kw">private</span> <span class="type">String</span> status;
+  <span class="kw">private double</span> hourlyRate;
+
+  <span class="cm">// Constructor</span>
+  <span class="kw">public</span> <span class="fn">ParkingSlot</span>(<span class="kw">int</span> id, <span class="type">String</span> code,
+      <span class="kw">int</span> floor, <span class="type">String</span> type,
+      <span class="type">String</span> status, <span class="kw">double</span> rate) {
+    <span class="kw">this</span>.slotId     = id;
+    <span class="kw">this</span>.slotCode   = code;
+    <span class="kw">this</span>.floorId    = floor;
+    <span class="kw">this</span>.slotType   = type;
+    <span class="kw">this</span>.status     = status;
+    <span class="kw">this</span>.hourlyRate = rate;
+  }
+
+  <span class="cm">// Getters & Setters</span>
+  <span class="kw">public int</span>    <span class="fn">getSlotId</span>()    { <span class="kw">return</span> slotId; }
+  <span class="kw">public</span> <span class="type">String</span> <span class="fn">getSlotCode</span>() { <span class="kw">return</span> slotCode; }
+  <span class="kw">public</span> <span class="type">String</span> <span class="fn">getStatus</span>()   { <span class="kw">return</span> status; }
+  <span class="kw">public void</span>   <span class="fn">setStatus</span>(<span class="type">String</span> s)
+                              { status = s; }
+  <span class="kw">public double</span> <span class="fn">getRate</span>()     { <span class="kw">return</span> hourlyRate; }
+
+  <span class="kw">public boolean</span> <span class="fn">isAvailable</span>() {
+    <span class="kw">return</span> <span class="str">"available"</span>.equals(status);
+  }
+}</pre>
+      </div>
+
+      <div class="java-card">
+        <div class="java-card-header">📋 SlotDAO.java (DAO Layer)</div>
+        <pre><span class="kw">import</span> java.sql.*;
+<span class="kw">import</span> java.util.*;
+
+<span class="kw">public class</span> <span class="fn">SlotDAO</span> {
+
+  <span class="kw">public</span> <span class="type">List</span>&lt;<span class="fn">ParkingSlot</span>&gt; <span class="fn">getAvailableSlots</span>()
+      <span class="kw">throws</span> <span class="type">SQLException</span> {
+    <span class="type">List</span>&lt;<span class="fn">ParkingSlot</span>&gt; list = <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;();
+    <span class="type">String</span> sql = <span class="str">"SELECT * FROM parking_slots "</span>
+               + <span class="str">"WHERE status = 'available'"</span>;
+    <span class="kw">try</span> (<span class="type">Connection</span> c = <span class="fn">DBConnection</span>.getConnection();
+         <span class="type">PreparedStatement</span> ps = c.prepareStatement(sql);
+         <span class="type">ResultSet</span> rs = ps.executeQuery()) {
+      <span class="kw">while</span> (rs.next()) {
+        list.add(<span class="kw">new</span> <span class="fn">ParkingSlot</span>(
+          rs.getInt(<span class="str">"slot_id"</span>),
+          rs.getString(<span class="str">"slot_code"</span>),
+          rs.getInt(<span class="str">"floor_id"</span>),
+          rs.getString(<span class="str">"slot_type"</span>),
+          rs.getString(<span class="str">"status"</span>),
+          rs.getDouble(<span class="str">"hourly_rate"</span>)));
+      }
+    }
+    <span class="kw">return</span> list;
+  }
+
+  <span class="kw">public boolean</span> <span class="fn">updateStatus</span>(
+      <span class="kw">int</span> slotId, <span class="type">String</span> status)
+      <span class="kw">throws</span> <span class="type">SQLException</span> {
+    <span class="type">String</span> sql = <span class="str">"UPDATE parking_slots "</span>
+               + <span class="str">"SET status=? WHERE slot_id=?"</span>;
+    <span class="kw">try</span> (<span class="type">Connection</span> c = <span class="fn">DBConnection</span>.getConnection();
+         <span class="type">PreparedStatement</span> ps = c.prepareStatement(sql)) {
+      ps.setString(<span class="num">1</span>, status);
+      ps.setInt(<span class="num">2</span>, slotId);
+      <span class="kw">return</span> ps.executeUpdate() > <span class="num">0</span>;
+    }
+  }
+}</pre>
+      </div>
+
+      <div class="java-card">
+        <div class="java-card-header">🔖 BookingService.java (Service)</div>
+        <pre><span class="kw">import</span> java.sql.*;
+
+<span class="kw">public class</span> <span class="fn">BookingService</span> {
+  <span class="kw">private final</span> <span class="fn">SlotDAO</span> slotDAO = <span class="kw">new</span> <span class="fn">SlotDAO</span>();
+
+  <span class="kw">public int</span> <span class="fn">bookSlot</span>(
+      <span class="kw">int</span> slotId, <span class="kw">int</span> userId,
+      <span class="kw">int</span> vehicleId)
+      <span class="kw">throws</span> <span class="type">Exception</span> {
+
+    <span class="type">Connection</span> conn =
+      <span class="fn">DBConnection</span>.getConnection();
+    conn.setAutoCommit(<span class="kw">false</span>);
+    <span class="kw">try</span> {
+      <span class="type">String</span> lock =
+        <span class="str">"SELECT status FROM parking_slots "</span> +
+        <span class="str">"WHERE slot_id=? FOR UPDATE"</span>;
+      <span class="type">PreparedStatement</span> ps =
+        conn.prepareStatement(lock);
+      ps.setInt(<span class="num">1</span>, slotId);
+      <span class="type">ResultSet</span> rs = ps.executeQuery();
+      <span class="kw">if</span> (!rs.next() ||
+          !<span class="str">"available"</span>.equals(
+            rs.getString(<span class="num">1</span>))) {
+        <span class="kw">throw new</span> <span class="type">Exception</span>(
+          <span class="str">"Slot not available"</span>);
+      }
+      <span class="type">String</span> ins =
+        <span class="str">"INSERT INTO bookings "</span> +
+        <span class="str">"(slot_id,user_id,vehicle_id,"</span> +
+        <span class="str">"check_in,status) "</span> +
+        <span class="str">"VALUES(?,?,?,NOW(),'active')"</span>;
+      <span class="type">PreparedStatement</span> ins_ps =
+        conn.prepareStatement(ins,
+          <span class="type">Statement</span>.RETURN_GENERATED_KEYS);
+      ins_ps.setInt(<span class="num">1</span>, slotId);
+      ins_ps.setInt(<span class="num">2</span>, userId);
+      ins_ps.setInt(<span class="num">3</span>, vehicleId);
+      ins_ps.executeUpdate();
+      <span class="kw">int</span> bid = ins_ps
+        .getGeneratedKeys().getInt(<span class="num">1</span>);
+
+      slotDAO.updateStatus(
+        slotId, <span class="str">"occupied"</span>);
+      conn.commit();
+      <span class="kw">return</span> bid;
+    } <span class="kw">catch</span> (<span class="type">Exception</span> e) {
+      conn.rollback(); <span class="kw">throw</span> e;
+    }
+  }
+}</pre>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ABOUT ══════════ -->
+<section class="section" id="about">
+  <div class="about-section">
+    <div class="page-title">System Architecture</div>
+    <div class="page-sub">A layered full-stack architecture designed for scale, concurrency, and real-time responsiveness.</div>
+
+    <div class="arch-grid">
+      <div class="arch-card">
+        <span class="arch-icon">🖥️</span>
+        <div class="arch-title">Frontend Layer</div>
+        <div class="arch-desc">Responsive HTML5/CSS3/JavaScript UI with real-time slot grid, booking modals, and data tables. Served via Java Servlet or Spring MVC.</div>
+        <div class="tech-tags">
+          <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span><span class="tag">JSP</span>
+        </div>
+      </div>
+
+      <div class="arch-card">
+        <span class="arch-icon">☕</span>
+        <div class="arch-title">Java Backend</div>
+        <div class="arch-desc">Business logic in Java using MVC pattern. Servlets handle HTTP requests; DAO classes isolate DB access; service layer enforces booking rules with row-level locking.</div>
+        <div class="tech-tags">
+          <span class="tag">Java 17</span><span class="tag">Servlets</span><span class="tag">JDBC</span><span class="tag">DAO</span>
+        </div>
+      </div>
+
+      <div class="arch-card">
+        <span class="arch-icon">🗄️</span>
+        <div class="arch-title">MySQL Database</div>
+        <div class="arch-desc">Relational schema with 5 core tables: floors, parking_slots, users, bookings, and payments. Transactional integrity via stored procedures and triggers.</div>
+        <div class="tech-tags">
+          <span class="tag">MySQL 8</span><span class="tag">Triggers</span><span class="tag">Procedures</span><span class="tag">InnoDB</span>
+        </div>
+      </div>
+
+      <div class="arch-card">
+        <span class="arch-icon">🔒</span>
+        <div class="arch-title">Concurrency Safety</div>
+        <div class="arch-desc">SELECT ... FOR UPDATE row locks prevent double-booking. Transactions with ROLLBACK on failure. Connection pooling via HikariCP for throughput.</div>
+        <div class="tech-tags">
+          <span class="tag">Transactions</span><span class="tag">Row Locks</span><span class="tag">HikariCP</span>
+        </div>
+      </div>
+
+      <div class="arch-card">
+        <span class="arch-icon">📊</span>
+        <div class="arch-title">Analytics Engine</div>
+        <div class="arch-desc">Aggregated SQL queries compute real-time occupancy rate, daily revenue, peak hours, and per-slot utilisation — dashboards update via AJAX polling.</div>
+        <div class="tech-tags">
+          <span class="tag">GROUP BY</span><span class="tag">CASE WHEN</span><span class="tag">AJAX</span>
+        </div>
+      </div>
+
+      <div class="arch-card">
+        <span class="arch-icon">🚀</span>
+        <div class="arch-title">Deployment</div>
+        <div class="arch-desc">Packaged as a WAR file, deployable to Apache Tomcat 10. MySQL hosted separately (local or cloud RDS). Configurable via environment variables.</div>
+        <div class="tech-tags">
+          <span class="tag">Tomcat 10</span><span class="tag">WAR</span><span class="tag">Maven</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="booking-modal">
+  <div class="modal">
+    <h3 id="modal-title">📍 Book Slot</h3>
+    <div class="form-group">
+      <label>Slot ID</label>
+      <input type="text" id="modal-slot" readonly>
+    </div>
+    <div class="form-group">
+      <label>Driver Name</label>
+      <input type="text" id="modal-name" placeholder="Enter your name">
+    </div>
+    <div class="form-group">
+      <label>Vehicle Plate No.</label>
+      <input type="text" id="modal-plate" placeholder="e.g. PB10-AB-1234">
+    </div>
+    <div class="form-group">
+      <label>Vehicle Type</label>
+      <select id="modal-vtype">
+        <option>Car</option>
+        <option>Bike</option>
+        <option>EV</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmBooking()">Confirm Booking</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────
+const SLOT_TYPES = ['Car','Car','Car','Car','Bike','Bike','EV','Handicap'];
+const FLOORS = ['A','B','C'];
+const STATUSES = ['available','available','available','available','occupied','occupied','reserved','maintenance'];
+const NAMES = ['Arjun S.','Priya K.','Rohit M.','Anita V.','Suresh P.','Neha T.','Vikram B.','Meera J.'];
+const PLATES = ['PB10AA1234','HR26BN5678','DL01CD9012','MH12EF3456','GJ05GH7890','KA03IJ2345','TN09KL6789','UP15MN1234'];
+
+let slots = [];
+let bookings = [];
+let selectedSlot = null;
+
+function initSlots() {
+  let id = 1;
+  FLOORS.forEach(f => {
+    const count = f === 'C' ? 10 : 20;
+    for (let i = 1; i <= count; i++) {
+      const code = `${f}-${String(i).padStart(2,'0')}`;
+      const type = SLOT_TYPES[Math.floor(Math.random()*SLOT_TYPES.length)];
+      let status;
+      const r = Math.random();
+      if (r < 0.45) status = 'available';
+      else if (r < 0.75) status = 'occupied';
+      else if (r < 0.88) status = 'reserved';
+      else status = 'maintenance';
+      slots.push({ id, code, floor: f, type, status, rate: type==='Bike'?15:type==='EV'?50:type==='Handicap'?20:30 });
+      id++;
+    }
+  });
+}
+
+function initBookings() {
+  const now = new Date();
+  for (let i = 1; i <= 18; i++) {
+    const checkIn = new Date(now - Math.random()*8*3600000);
+    const done = Math.random() > 0.35;
+    const checkOut = done ? new Date(checkIn.getTime() + Math.random()*4*3600000) : null;
+    const hrs = checkOut ? (checkOut-checkIn)/3600000 : null;
+    const rate = [15,30,50][Math.floor(Math.random()*3)];
+    const statuses = ['active','completed','cancelled'];
+    const status = done ? (Math.random()>0.15?'completed':'cancelled') : 'active';
+    bookings.push({
+      id: `BK${String(i).padStart(4,'0')}`,
+      slot: slots[Math.floor(Math.random()*slots.length)].code,
+      name: NAMES[Math.floor(Math.random()*NAMES.length)],
+      plate: PLATES[Math.floor(Math.random()*PLATES.length)],
+      checkIn: checkIn.toLocaleString(),
+      checkOut: checkOut ? checkOut.toLocaleString() : '—',
+      amount: hrs ? `₹${(hrs*rate).toFixed(2)}` : '—',
+      status
+    });
+  }
+}
+
+// ─── NAV ────────────────────────────────────────────────────────
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  if (id === 'dashboard') renderGrid();
+  if (id === 'bookings') renderTable();
+  updateHomeStats();
+}
+
+// ─── STATS ──────────────────────────────────────────────────────
+function updateHomeStats() {
+  const avail = slots.filter(s=>s.status==='available').length;
+  const occ   = slots.filter(s=>s.status==='occupied').length;
+  const rev   = bookings.filter(b=>b.status==='completed').reduce((a,b)=>{
+    const n = parseFloat(b.amount.replace('₹','')) || 0; return a+n;
+  },0);
+  document.getElementById('hs-avail').textContent = avail;
+  document.getElementById('hs-occ').textContent   = occ;
+  document.getElementById('hs-rev').textContent   = '₹'+rev.toFixed(0);
+  document.getElementById('cnt-avail').textContent = avail;
+  document.getElementById('cnt-occ').textContent   = occ;
+  document.getElementById('cnt-res').textContent   = slots.filter(s=>s.status==='reserved').length;
+  document.getElementById('cnt-mnt').textContent   = slots.filter(s=>s.status==='maintenance').length;
+}
+
+// ─── GRID ───────────────────────────────────────────────────────
+const ICONS = { Car:'🚗', Bike:'🏍️', EV:'⚡', Handicap:'♿' };
+
+function renderGrid() {
+  updateHomeStats();
+  const floor  = document.getElementById('floor-select').value;
+  const type   = document.getElementById('type-filter').value;
+  const status = document.getElementById('status-filter').value;
+  const grid   = document.getElementById('parking-grid');
+
+  const filtered = slots.filter(s => {
+    if (floor !== 'all' && s.floor !== floor) return false;
+    if (type !== 'all' && s.type !== type) return false;
+    if (status !== 'all' && s.status !== status) return false;
+    return true;
+  });
+
+  grid.innerHTML = filtered.map(s => `
+    <div class="slot ${s.status}" onclick="slotClick(${s.id})" title="${s.code} · ${s.type} · ₹${s.rate}/hr">
+      <div class="slot-icon">${ICONS[s.type]||'🚗'}</div>
+      <div class="slot-id">${s.code}</div>
+    </div>
+  `).join('');
+}
+
+function slotClick(id) {
+  const s = slots.find(x=>x.id===id);
+  if (!s) return;
+  if (s.status === 'available') {
+    selectedSlot = s;
+    document.getElementById('modal-slot').value = `${s.code} (${s.type}) · ₹${s.rate}/hr`;
+    document.getElementById('modal-title').textContent = `📍 Book Slot ${s.code}`;
+    document.getElementById('modal-name').value = '';
+    document.getElementById('modal-plate').value = '';
+    document.getElementById('booking-modal').classList.add('show');
+  } else if (s.status === 'occupied') {
+    showToast(`Slot ${s.code} is occupied. Cannot book.`, true);
+  } else if (s.status === 'reserved') {
+    showToast(`Slot ${s.code} is reserved.`, true);
+  } else {
+    showToast(`Slot ${s.code} is under maintenance.`, true);
+  }
+}
+
+function closeModal() {
+  document.getElementById('booking-modal').classList.remove('show');
+  selectedSlot = null;
+}
+
+function confirmBooking() {
+  const name  = document.getElementById('modal-name').value.trim();
+  const plate = document.getElementById('modal-plate').value.trim();
+  if (!name || !plate) { showToast('Please fill all fields.', true); return; }
+
+  selectedSlot.status = 'occupied';
+  bookings.unshift({
+    id: `BK${String(bookings.length+1).padStart(4,'0')}`,
+    slot: selectedSlot.code,
+    name, plate,
+    checkIn: new Date().toLocaleString(),
+    checkOut: '—',
+    amount: '—',
+    status: 'active'
+  });
+  closeModal();
+  renderGrid();
+  showToast(`✅ Booking confirmed for ${selectedSlot ? selectedSlot.code : ''} — SQL: INSERT INTO bookings ...`);
+}
+
+// ─── TABLE ──────────────────────────────────────────────────────
+function renderTable() {
+  const q      = (document.getElementById('search-box').value||'').toLowerCase();
+  const filter = document.getElementById('status-table-filter').value;
+  const tbody  = document.getElementById('table-body');
+
+  const filtered = bookings.filter(b => {
+    if (filter !== 'all' && b.status !== filter) return false;
+    if (q && !b.name.toLowerCase().includes(q) && !b.plate.toLowerCase().includes(q) && !b.slot.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  tbody.innerHTML = filtered.map(b => `
+    <tr>
+      <td style="color:var(--muted);font-family:'Share Tech Mono',monospace">${b.id}</td>
+      <td style="color:var(--accent);font-family:'Share Tech Mono',monospace">${b.slot}</td>
+      <td>${b.plate}</td>
+      <td>${b.name}</td>
+      <td>${b.checkIn}</td>
+      <td>${b.checkOut}</td>
+      <td style="color:var(--accent2)">${b.amount}</td>
+      <td><span class="status-badge badge-${b.status}">${b.status}</span></td>
+      <td>${b.status==='active' ? `<button class="btn-sm btn-danger-sm" onclick="cancelBooking('${b.id}')">Cancel</button>` : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+function cancelBooking(bid) {
+  const b = bookings.find(x=>x.id===bid);
+  if (b) {
+    b.status = 'cancelled';
+    const s = slots.find(x=>x.code===b.slot);
+    if (s) s.status = 'available';
+    renderTable();
+    updateHomeStats();
+    showToast(`Booking ${bid} cancelled. SQL: UPDATE bookings SET status='cancelled' ...`);
+  }
+}
+
+function exportCSV() {
+  const rows = [['Booking ID','Slot','Plate','Driver','Check-in','Check-out','Amount','Status']];
+  bookings.forEach(b => rows.push([b.id,b.slot,b.plate,b.name,b.checkIn,b.checkOut,b.amount,b.status]));
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv,' + encodeURIComponent(csv);
+  a.download = 'smartpark_bookings.csv';
+  a.click();
+  showToast('📥 CSV exported!');
+}
+
+// ─── SQL TABS ───────────────────────────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.sql-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function copyCode(paneId) {
+  const text = document.getElementById(paneId).innerText.replace('COPY','').trim();
+  navigator.clipboard.writeText(text).then(()=>showToast('Copied to clipboard!'));
+}
+
+// ─── TOAST ──────────────────────────────────────────────────────
+function showToast(msg, err=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (err?' error':'');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ─── INIT ───────────────────────────────────────────────────────
+initSlots();
+initBookings();
+updateHomeStats();
+</script>
+</body>
+</html>
